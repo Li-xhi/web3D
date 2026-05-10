@@ -1,0 +1,189 @@
+/* =============================================
+   About 页面专属样式
+   复用 main.css 中定义的 CSS 变量
+   ============================================= */
+
+:root {
+  --museum-bg: #0d0d0f;
+  --museum-surface: #16161a;
+  --museum-panel: #1c1c22;
+  --museum-border: #2a2a35;
+  --museum-gold: #c9a84c;
+  --museum-gold-dim: #8a7035;
+  --museum-text: #e8e4dc;
+  --museum-text-muted: #7a7880;
+  --navbar-height: 56px;
+}
+
+html, body {
+  background: var(--museum-bg);
+  color: var(--museum-text);
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
+}
+
+/* 导航栏（复用 main.css 风格，此处重新声明以独立使用） */
+.museum-navbar {
+  background: linear-gradient(90deg, #0a0a0c 0%, #1a1a20 100%);
+  border-bottom: 1px solid var(--museum-border);
+}
+
+.museum-brand {
+  color: var(--museum-gold) !important;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+/* 主体容器 */
+.about-container {
+  max-width: 860px;
+  padding-top: calc(var(--navbar-height) + 2rem);
+  padding-bottom: 3rem;
+}
+
+/* 页面标题 */
+.about-header {
+  margin-bottom: 3rem;
+}
+
+.about-header h1 {
+  color: var(--museum-gold);
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.about-header .lead {
+  color: var(--museum-text);
+  font-size: 1.1rem;
+}
+
+.about-header .text-muted {
+  color: var(--museum-text-muted) !important;
+}
+
+/* 各章节 */
+.about-section {
+  margin-bottom: 2.5rem;
+  padding: 1.5rem;
+  background: var(--museum-surface);
+  border: 1px solid var(--museum-border);
+  border-radius: 8px;
+}
+
+.about-section h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--museum-gold);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.about-section h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--museum-text);
+  margin: 1rem 0 0.5rem;
+}
+
+.about-section p,
+.about-section li {
+  color: var(--museum-text-muted);
+  font-size: 0.88rem;
+  line-height: 1.65;
+}
+
+.about-section ul {
+  padding-left: 1.2rem;
+}
+
+/* 技术决策定义列表 */
+.tech-list {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 0.6rem 1rem;
+  align-items: start;
+}
+
+.tech-list dt {
+  color: var(--museum-gold);
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding-top: 0.1rem;
+}
+
+.tech-list dd {
+  color: var(--museum-text-muted);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* 引用卡片 */
+.credit-card {
+  background: var(--museum-panel);
+  border: 1px solid var(--museum-border);
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 0.8rem;
+}
+
+.credit-card h3 {
+  margin-top: 0;
+  color: var(--museum-text) !important;
+}
+
+.credit-card a {
+  color: var(--museum-gold);
+  text-decoration: none;
+}
+
+.credit-card a:hover {
+  text-decoration: underline;
+}
+
+/* 测试记录表格 */
+.test-table {
+  background: var(--museum-panel);
+  border-color: var(--museum-border);
+  font-size: 0.85rem;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.table-dark {
+  --bs-table-bg: var(--museum-panel);
+  --bs-table-striped-bg: var(--museum-surface);
+  --bs-table-border-color: var(--museum-border);
+  color: var(--museum-text-muted);
+}
+
+/* 页脚 */
+.about-footer {
+  padding: 1.5rem;
+  border-top: 1px solid var(--museum-border);
+  color: var(--museum-text-muted);
+  font-size: 0.82rem;
+  background: var(--museum-panel);
+  margin-top: 1rem;
+}
+
+.about-footer a {
+  color: var(--museum-gold);
+  text-decoration: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--museum-gold);
+  outline-offset: 2px;
+}
+
+code {
+  background: var(--museum-bg);
+  color: var(--museum-gold);
+  padding: 0.1em 0.35em;
+  border-radius: 3px;
+  font-size: 0.85em;
+}

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About — Handheld Heritage</title>
+
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="/src/css/about.css" />
+</head>
+<body>
+
+  <nav class="navbar navbar-dark museum-navbar" aria-label="主导航">
+    <div class="container-fluid">
+      <a class="navbar-brand museum-brand" href="index.html">
+        <i class="bi bi-controller" aria-hidden="true"></i>
+        Handheld Heritage
+      </a>
+      <a href="index.html" class="btn btn-outline-light btn-sm">← 返回展览</a>
+    </div>
+  </nav>
+
+  <main class="container about-container" role="main">
+
+    <!-- 页面标题 -->
+    <header class="about-header text-center">
+      <h1>About This Project</h1>
+      <p class="lead">Handheld Heritage — 交互式 3D 复古掌机博物馆</p>
+      <p class="text-muted">University of Sussex · 3D Apps · A2 Assignment · 2026</p>
+    </header>
+
+    <!-- 1. 设计理念 -->
+    <section class="about-section" aria-labelledby="design-heading">
+      <h2 id="design-heading"><i class="bi bi-lightbulb" aria-hidden="true"></i> 设计理念</h2>
+      <p>
+        本项目以"掌机演化"为主线，聚焦 Game Boy（1989）、GBA SP（2003）、PSP（2004）三代里程碑产品。
+        选题原因有三：其一，三款机型在硬件材质上截然不同（哑光灰塑料 → 金属漆翻盖 → 钢琴黑亮面），
+        天然适合展示 PBR 材质的表现力；其二，三代之间存在清晰的技术演进叙事，便于构建博物馆式的叙事框架；
+        其三，作为游戏文化符号，掌机具有强烈的情感共鸣，能吸引观众深度交互。
+      </p>
+      <p>
+        UI 采用深色博物馆风格，以金色点缀为主，模仿实体博物馆展柜的沉浸感。
+        左侧为控制面板，右侧为全屏 3D 展示区，减少界面干扰，让模型成为视觉焦点。
+      </p>
+    </section>
+
+    <!-- 2. 技术决策 -->
+    <section class="about-section" aria-labelledby="tech-heading">
+      <h2 id="tech-heading"><i class="bi bi-code-slash" aria-hidden="true"></i> 技术决策</h2>
+      <dl class="tech-list">
+        <dt>Three.js</dt>
+        <dd>业界主流 WebGL 库，提供完整的 PBR 材质系统、GLTFLoader、EffectComposer 后期处理链，无需自行管理 WebGL 上下文。</dd>
+
+        <dt>Vite</dt>
+        <dd>原生 ES module 支持，热模块替换（HMR）让 shader 迭代极快；构建产物体积小，适合作业提交。</dd>
+
+        <dt>Bootstrap 5</dt>
+        <dd>评分点要求，提供响应式网格和组件基础，自定义 CSS 变量实现深色主题覆盖。</dd>
+
+        <dt>GSAP</dt>
+        <dd>专业动画引擎，处理相机位置插值、翻盖旋转、UI 过渡比原生 CSS transition 更精确可控。</dd>
+
+        <dt>自定义 GLSL Shader</dt>
+        <dd>CRT 屏幕 shader 实现扫描线、RGB 通道偏移、桶形畸变，赋予屏幕复古质感，满足 Deeper Understanding 评分项。</dd>
+
+        <dt>UnrealBloomPass</dt>
+        <dd>后期处理发光效果，让掌机屏幕和 LED 指示灯具备真实的光晕，提升画面质量。</dd>
+
+        <dt>RGBELoader + HDRi</dt>
+        <dd>高动态范围环境贴图，使 PSP 钢琴黑表面能真实反射周围环境，体现 PBR 材质的金属感。</dd>
+      </dl>
+    </section>
+
+    <!-- 3. MVC 架构说明 -->
+    <section class="about-section" aria-labelledby="mvc-heading">
+      <h2 id="mvc-heading"><i class="bi bi-diagram-3" aria-hidden="true"></i> MVC 架构</h2>
+      <ul>
+        <li><strong>Model</strong>（<code>src/js/model/consoles.js</code>）：存储三台掌机的元数据，与渲染逻辑完全解耦。</li>
+        <li><strong>View</strong>（<code>src/js/view/</code>）：Three.js 场景初始化、GLTF 加载、后期处理、GSAP 动画封装。</li>
+        <li><strong>Controller</strong>（<code>src/js/controller/</code>）：DOM 事件绑定、用户输入分发、音频控制，不直接操作 Three.js 对象。</li>
+      </ul>
+    </section>
+
+    <!-- 4. 可访问性 -->
+    <section class="about-section" aria-labelledby="a11y-heading">
+      <h2 id="a11y-heading"><i class="bi bi-universal-access" aria-hidden="true"></i> 可访问性</h2>
+      <ul>
+        <li>所有交互按钮含 <code>aria-label</code> 或可见文字，屏幕阅读器可读。</li>
+        <li>Toggle 按钮使用 <code>aria-pressed</code> 状态，状态变化时同步更新属性。</li>
+        <li>3D 画布附有描述性 <code>aria-label</code>，加载进度区域有 <code>aria-live="polite"</code>。</li>
+        <li>键盘导航：Tab 键遍历所有控制按钮，Enter / Space 触发交互；方向键可旋转模型（通过 OrbitControls 键盘绑定）。</li>
+        <li>颜色对比度：所有文字与背景的对比度 ≥ 4.5:1，符合 WCAG 2.1 AA 标准。</li>
+        <li>运动减弱：检测 <code>prefers-reduced-motion</code>，开启时禁用 GSAP 过渡动画。</li>
+      </ul>
+    </section>
+
+    <!-- 5. 模型来源 -->
+    <section class="about-section" aria-labelledby="credits-heading">
+      <h2 id="credits-heading"><i class="bi bi-box" aria-hidden="true"></i> 3D 模型来源</h2>
+
+      <div class="credit-card">
+        <h3>Game Boy Classic</h3>
+        <ul>
+          <li><strong>原作者：</strong>Georg Klein</li>
+          <li><strong>来源：</strong><a href="https://sketchfab.com/3d-models/game-boy-classic-0ae80019e6f046168923286d7e628f6f" target="_blank" rel="noopener">Sketchfab</a></li>
+          <li><strong>协议：</strong>CC Attribution 4.0 (CC BY 4.0)</li>
+          <li><strong>本项目改动：</strong>重新贴图屏幕区域，添加视频材质、动画骨骼，优化面数。</li>
+        </ul>
+      </div>
+
+      <div class="credit-card">
+        <h3>Game Boy Advance SP</h3>
+        <ul>
+          <li><strong>原作者：</strong>Smoggybeard</li>
+          <li><strong>来源：</strong><a href="https://sketchfab.com/3d-models/gameboy-advance-sp-b79bb731b6b844fd8c61bee31e26a323" target="_blank" rel="noopener">Sketchfab</a></li>
+          <li><strong>协议：</strong>CC Attribution 4.0 (CC BY 4.0)</li>
+          <li><strong>本项目改动：</strong>大幅减面，添加翻盖铰链动画骨骼，更新金属漆 PBR 材质，重建屏幕材质为视频贴图。</li>
+        </ul>
+      </div>
+
+      <div class="credit-card">
+        <h3>Sony PlayStation Portable (PSP-1000)</h3>
+        <ul>
+          <li><strong>原作者：</strong>Blaž Mraz</li>
+          <li><strong>来源：</strong><a href="https://sketchfab.com/3d-models/sony-playstation-portable-9fe719bffd724f5b95a03e8875078f3c" target="_blank" rel="noopener">Sketchfab</a></li>
+          <li><strong>协议：</strong>CC Attribution 4.0 (CC BY 4.0)</li>
+          <li><strong>本项目改动：</strong>更新钢琴黑亮面 PBR 材质（metalness=1.0），添加 UMD 仓开合动画，重建屏幕材质为视频贴图。</li>
+        </ul>
+      </div>
+
+      <div class="credit-card">
+        <h3>HDRi 环境贴图</h3>
+        <ul>
+          <li><strong>来源：</strong><a href="https://polyhaven.com" target="_blank" rel="noopener">Poly Haven</a></li>
+          <li><strong>协议：</strong>CC0（公共领域）</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 6. 测试记录 -->
+    <section class="about-section" aria-labelledby="test-heading">
+      <h2 id="test-heading"><i class="bi bi-check2-circle" aria-hidden="true"></i> 测试记录</h2>
+
+      <table class="table table-dark table-striped test-table" aria-label="浏览器兼容性测试">
+        <thead>
+          <tr>
+            <th scope="col">浏览器</th>
+            <th scope="col">版本</th>
+            <th scope="col">3D 渲染</th>
+            <th scope="col">视频贴图</th>
+            <th scope="col">音频</th>
+            <th scope="col">结果</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Chrome</td>
+            <td>124+</td>
+            <td>✓</td>
+            <td>✓</td>
+            <td>✓</td>
+            <td><span class="badge bg-success">通过</span></td>
+          </tr>
+          <tr>
+            <td>Firefox</td>
+            <td>125+</td>
+            <td>✓</td>
+            <td>✓</td>
+            <td>✓</td>
+            <td><span class="badge bg-success">通过</span></td>
+          </tr>
+          <tr>
+            <td>Safari</td>
+            <td>17+</td>
+            <td>✓</td>
+            <td>需 muted 属性</td>
+            <td>需用户手势</td>
+            <td><span class="badge bg-warning text-dark">部分通过</span></td>
+          </tr>
+          <tr>
+            <td>Edge</td>
+            <td>124+</td>
+            <td>✓</td>
+            <td>✓</td>
+            <td>✓</td>
+            <td><span class="badge bg-success">通过</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>已知问题 &amp; 修复记录</h3>
+      <ul id="bug-list">
+        <li>Safari 不允许无手势自动播放视频 → 所有 <code>&lt;video&gt;</code> 添加 <code>muted</code> 属性，点击"开机"后再取消静音。</li>
+        <li>低端 GPU 上 Bloom 后期处理帧率下降 → 增加性能检测，低于 30fps 时自动降低 Bloom 强度。</li>
+      </ul>
+    </section>
+
+  </main>
+
+  <footer class="about-footer text-center">
+    <p>Handheld Heritage · University of Sussex 3D Apps 2026 ·
+      <a href="index.html">返回展览</a>
+    </p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

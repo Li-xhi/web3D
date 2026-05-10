@@ -1,0 +1,18 @@
+{
+  "name": "handheld-heritage",
+  "version": "1.0.0",
+  "description": "交互式 3D 复古掌机博物馆 — University of Sussex 3D Apps 期末作业",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "three": "^0.176.0",
+    "gsap": "^3.12.7"
+  },
+  "devDependencies": {
+    "vite": "^6.3.5"
+  }
+}
