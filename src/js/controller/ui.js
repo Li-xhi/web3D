@@ -1,68 +1,32 @@
 /**
  * MVC — Controller 层
- * 负责：UI 事件绑定（导航栏 dropdown、展品卡片、相机预设、场景控制按钮）
- *       不直接操作 Three.js 对象，通过回调委托给 main.js
+ * 负责：UI 事件绑定
  *
- * 新结构对应 index.html：
- *   - 导航栏 dropdown 的 [data-console] 链接
- *   - 展品卡片的 .btn-load 按钮
- *   - 相机预设 #camera-presets 容器（动态生成）
- *   - Hero 控制浮层：#btn-wireframe / #btn-light / #btn-bgm / #btn-flip
+ * 导出：
+ *   bindUI()          — index.html 用（卡片切换 + 场景按钮）
+ *   bindSceneButtons()— 展品页 viewer.js 单独调用
+ *   updateCameraPresets / updateConsoleInfo / setActiveConsole
+ *   toggleFlipButton / setLoadingVisible
  */
 
 import { consoles } from '../model/consoles.js';
 
-/**
- * 绑定所有 UI 事件
- * @param {object} callbacks
- */
+/* =============================================
+   公共入口（index.html 主页使用）
+   ============================================= */
 export function bindUI(callbacks) {
   bindNavDropdown(callbacks.onConsoleSwitch);
   bindConsoleCards(callbacks.onConsoleSwitch);
   bindSceneButtons(callbacks);
 }
 
-/* ---- 导航栏 Dropdown 链接 ---- */
-function bindNavDropdown(onSwitch) {
-  document.querySelectorAll('[data-console]').forEach((el) => {
-    // 只绑定导航里的 <a> 标签（排除卡片按钮，卡片单独处理）
-    if (el.tagName !== 'A') return;
-    el.addEventListener('click', (e) => {
-      e.preventDefault();
-      const id = el.dataset.console;
-      const data = consoles.find((c) => c.id === id);
-      if (data) onSwitch?.(data);
-    });
-  });
-}
-
-/* ---- 展品卡片按钮 ---- */
-function bindConsoleCards(onSwitch) {
-  document.querySelectorAll('.btn-load').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const id = btn.dataset.console;
-      const data = consoles.find((c) => c.id === id);
-      if (data) onSwitch?.(data);
-    });
-  });
-
-  // 点击整张卡片也触发（提升交互面积）
-  document.querySelectorAll('.museum-card').forEach((card) => {
-    card.addEventListener('click', (e) => {
-      // 防止重复触发（卡片内按钮会冒泡）
-      if (e.target.closest('.btn-load')) return;
-      const id = card.dataset.console;
-      const data = consoles.find((c) => c.id === id);
-      if (data) onSwitch?.(data);
-    });
-  });
-}
-
-/* ---- Hero 浮层场景控制按钮 ---- */
-function bindSceneButtons({ onWireframeToggle, onLightToggle, onBgmToggle, onFlip }) {
+/* =============================================
+   场景控制按钮（展品页 viewer.js 单独调用）
+   ============================================= */
+export function bindSceneButtons({ onWireframeToggle, onLightToggle, onBgmToggle, onFlip } = {}) {
   bindToggleBtn('btn-wireframe', onWireframeToggle);
-  bindToggleBtn('btn-light', onLightToggle);
-  bindToggleBtn('btn-bgm', onBgmToggle);
+  bindToggleBtn('btn-light',     onLightToggle);
+  bindToggleBtn('btn-bgm',       onBgmToggle);
 
   const flipBtn = document.getElementById('btn-flip');
   if (flipBtn) {
@@ -74,23 +38,53 @@ function bindSceneButtons({ onWireframeToggle, onLightToggle, onBgmToggle, onFli
   }
 }
 
+/* ---- 内部：通用 toggle 按钮绑定 ---- */
 function bindToggleBtn(id, callback) {
   const btn = document.getElementById(id);
   if (!btn) return;
   btn.addEventListener('click', () => {
-    const isOn = btn.getAttribute('aria-pressed') === 'true';
-    const next = !isOn;
+    const next = btn.getAttribute('aria-pressed') !== 'true';
     btn.setAttribute('aria-pressed', String(next));
     btn.classList.toggle('active', next);
     callback?.(next);
   });
 }
 
-/**
- * 动态生成相机预设按钮（#camera-presets 容器）
- * @param {object} consoleData
- * @param {function} onPresetClick
- */
+/* ---- 导航栏 Dropdown 链接（index.html 主页用） ---- */
+function bindNavDropdown(onSwitch) {
+  document.querySelectorAll('.museum-dropdown [data-console]').forEach((el) => {
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      const data = consoles.find((c) => c.id === el.dataset.console);
+      if (data) onSwitch?.(data);
+    });
+  });
+}
+
+/* ---- 展品卡片按钮（index.html 主页用） ---- */
+function bindConsoleCards(onSwitch) {
+  // "加载展品"按钮
+  document.querySelectorAll('.btn-load[data-console]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const data = consoles.find((c) => c.id === btn.dataset.console);
+      if (data) onSwitch?.(data);
+    });
+  });
+  // 点击整张卡片（冒泡中排除按钮自身）
+  document.querySelectorAll('.museum-card[data-console]').forEach((card) => {
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('.btn-load')) return;
+      const data = consoles.find((c) => c.id === card.dataset.console);
+      if (data) onSwitch?.(data);
+    });
+  });
+}
+
+/* =============================================
+   共享 UI 更新函数（index.html 和展品页均可用）
+   ============================================= */
+
+/** 动态生成相机预设按钮 */
 export function updateCameraPresets(consoleData, onPresetClick) {
   const container = document.getElementById('camera-presets');
   if (!container) return;
@@ -110,51 +104,31 @@ export function updateCameraPresets(consoleData, onPresetClick) {
   });
 }
 
-/**
- * 更新 Hero 右下角展品信息浮层
- * @param {object} consoleData
- */
+/** 更新 Hero 展品信息浮层 */
 export function updateConsoleInfo(consoleData) {
-  const nameEl = document.getElementById('info-name');
-  const yearEl = document.getElementById('info-year');
-  const descEl = document.getElementById('info-desc');
-
-  if (nameEl) nameEl.textContent = `${consoleData.manufacturer} ${consoleData.name}`;
-  if (yearEl) yearEl.textContent = `${consoleData.year} 年`;
-  if (descEl) descEl.textContent = consoleData.description;
+  const set = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
+  set('info-name', `${consoleData.manufacturer} ${consoleData.name}`);
+  set('info-year', `${consoleData.year} 年`);
+  set('info-desc', consoleData.description);
 }
 
-/**
- * 高亮活跃的展品卡片，并同步导航 dropdown 状态
- * @param {string} consoleId
- */
+/** 高亮当前活跃展品卡片和 dropdown 条目（index.html 主页用） */
 export function setActiveConsole(consoleId) {
-  // 卡片
-  document.querySelectorAll('.museum-card').forEach((card) => {
+  document.querySelectorAll('.museum-card[data-console]').forEach((card) => {
     card.classList.toggle('active-card', card.dataset.console === consoleId);
   });
-
-  // 导航 dropdown 条目
-  document.querySelectorAll('.museum-dropdown .dropdown-item').forEach((item) => {
+  document.querySelectorAll('.museum-dropdown [data-console]').forEach((item) => {
     item.classList.toggle('active-console', item.dataset.console === consoleId);
   });
 }
 
-/**
- * 显示/隐藏翻盖按钮（仅 GBA SP 可见）
- * @param {boolean} show
- */
+/** 翻盖按钮显示/隐藏（仅 GBA SP 可见） */
 export function toggleFlipButton(show) {
   const btn = document.getElementById('btn-flip');
-  if (!btn) return;
-  btn.classList.toggle('d-none', !show);
+  if (btn) btn.classList.toggle('d-none', !show);
 }
 
-/**
- * 显示/隐藏加载遮罩
- * @param {boolean} visible
- * @param {string} [text]
- */
+/** 加载遮罩显示/隐藏 */
 export function setLoadingVisible(visible, text = '正在加载展品…') {
   const overlay = document.getElementById('loading-overlay');
   const textEl  = document.getElementById('loading-text');
