@@ -15,7 +15,8 @@ export function initScene(canvas) {
     alpha: false,
   });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+  // 第三参数 false：不让 Three.js 覆盖 CSS 的 width/height（画布尺寸由 CSS 控制）
+  renderer.setSize(canvas.clientWidth || 800, canvas.clientHeight || 600, false);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.2;
