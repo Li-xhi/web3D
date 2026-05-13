@@ -7,6 +7,7 @@ University of Sussex · 3D Apps · Assignment A2 · 2026
 
 🌐 Live: [users.sussex.ac.uk/~xl434/](https://users.sussex.ac.uk/~xl434/)
 📦 Code: [github.com/Li-xhi/web3D](https://github.com/Li-xhi/web3D)
+🇬🇧 English version: [README_EN.md](./README_EN.md)
 
 ---
 
@@ -114,7 +115,7 @@ web3D/
 - **GSAP** — 相机过渡 / 按键按下动画
 - **Bootstrap 5.3** — 响应式栅格 + 暗色主题基础
 - **Vite 6** — 多页面打包（rollupOptions.input）+ `?raw` 着色器导入
-- **原生 ES Modules** — 无 React/Vue，纯 MVC 手写
+- **原生 ES Modules** — 无 React/Vue,纯 MVC 手写
 
 ---
 
@@ -140,6 +141,43 @@ web3D/
 
 ---
 
+## References & Credits
+
+### 软件 / 库（按官方文档使用，无修改）
+
+- **[Three.js](https://threejs.org/)** r176 — 3D 渲染核心
+  - 官方文档：<https://threejs.org/docs/>
+  - 官方示例（学习 GLTFLoader / AnimationMixer / OrbitControls 用法）：<https://threejs.org/examples/>
+- **[GSAP](https://greensock.com/gsap/)** — 相机过渡 / 按键动画补间
+  - 文档：<https://greensock.com/docs/>
+- **[Bootstrap 5.3](https://getbootstrap.com/)** — 响应式栅格与基础组件
+  - Icons：<https://icons.getbootstrap.com/>
+- **[Vite 6](https://vite.dev/)** — 多页面构建工具
+  - 多页面配置参考：<https://vite.dev/guide/build.html#multi-page-app>
+
+### 视频教程参考
+
+感谢 [YouTube](https://www.youtube.com/) 和 [Bilibili](https://www.bilibili.com/) 上众多创作者发布的 Three.js
+入门教学、Blender 硬表面建模与 glTF 导出工作流相关视频——它们帮助我建立了从建模到 Web 渲染
+的完整知识链路。项目代码为独立编写。
+
+### 文档 / 文章参考
+
+- MDN Web Docs — `<input type="color">` / `sessionStorage` / Audio API
+  - <https://developer.mozilla.org/>
+- Sussex 3D Apps Lab 课件（Three.js 基础 / Bootstrap 排版）
+
+### 资源版权
+
+- **3D 模型**：本人在 Blender 中原创建模（详见 About 页 "How I made the three models"）
+- **背景音乐**：取自任天堂 / 科乐美原版游戏音乐，仅作学术作业演示用
+  - 近藤浩治《Super Mario Bros. 水中BGM》© Nintendo
+  - 東野美紀《Yie Ar Kung-Fu》© Konami
+  - 前沢秀憲 / 禎清宏《密林の戦い》© Konami
+- **字体 / 图标**：Bootstrap Icons（MIT 协议）、系统默认 Segoe UI
+
+---
+
 ## 许可证
 
-代码 MIT。3D 模型为本人在 Blender 中原创建模（详见 About 页 "How I made the three models"）。
+代码 MIT。3D 模型为本人在 Blender 中原创建模。背景音乐版权归原作者所有。
