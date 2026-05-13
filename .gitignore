@@ -2,3 +2,16 @@ node_modules/
 dist/
 .DS_Store
 *.local
+
+# 本地 IDE / 工具配置
+.claude/
+.vscode/
+.idea/
+
+# 作业 brief / 内部文档（不公开传播）
+*.docx
+*.pdf
+PROJECT_BRIEF.md
+
+# 提交用的 zip 包
+*.zip

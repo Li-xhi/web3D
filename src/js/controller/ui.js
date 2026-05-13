@@ -23,18 +23,39 @@ export function bindUI(callbacks) {
 /* =============================================
    场景控制按钮（展品页 viewer.js 单独调用）
    ============================================= */
-export function bindSceneButtons({ onWireframeToggle, onLightToggle, onBgmToggle, onFlip } = {}) {
+export function bindSceneButtons({
+  onWireframeToggle,
+  onLightToggle,
+  onBgmToggle,
+  onFlip,
+  onAutoRotateToggle,
+  onColorChange,
+  onColorReset,
+  getFlipState,        // 从 viewer.js 读取当前 isFlipOpen，避免相机预设切换后按钮状态不同步
+} = {}) {
   bindToggleBtn('btn-wireframe', onWireframeToggle);
   bindToggleBtn('btn-light',     onLightToggle);
   bindToggleBtn('btn-bgm',       onBgmToggle);
+  bindToggleBtn('btn-rotate',    onAutoRotateToggle);
 
   const flipBtn = document.getElementById('btn-flip');
   if (flipBtn) {
-    let isOpen = false;
     flipBtn.addEventListener('click', () => {
-      isOpen = !isOpen;
-      onFlip?.(isOpen);
+      const currentlyOpen = getFlipState?.() ?? true;
+      onFlip?.(!currentlyOpen);
     });
+  }
+
+  // 颜色拾取器（原生 <input type="color">）
+  const colorInput = document.getElementById('btn-color');
+  if (colorInput) {
+    colorInput.addEventListener('input', (e) => onColorChange?.(e.target.value));
+  }
+
+  // 颜色重置按钮（恢复模型原色）
+  const colorResetBtn = document.getElementById('btn-color-reset');
+  if (colorResetBtn) {
+    colorResetBtn.addEventListener('click', () => onColorReset?.());
   }
 }
 
@@ -94,7 +115,7 @@ export function updateCameraPresets(consoleData, onPresetClick) {
     const btn = document.createElement('button');
     btn.className = 'btn-camera-preset' + (index === 0 ? ' active' : '');
     btn.textContent = preset.name;
-    btn.setAttribute('aria-label', `切换到${preset.name}视角`);
+    btn.setAttribute('aria-label', `Switch to ${preset.name} view`);
     btn.addEventListener('click', () => {
       container.querySelectorAll('.btn-camera-preset').forEach((b) => b.classList.remove('active'));
       btn.classList.add('active');
@@ -108,7 +129,7 @@ export function updateCameraPresets(consoleData, onPresetClick) {
 export function updateConsoleInfo(consoleData) {
   const set = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
   set('info-name', `${consoleData.manufacturer} ${consoleData.name}`);
-  set('info-year', `${consoleData.year} 年`);
+  set('info-year', `Released ${consoleData.year}`);
   set('info-desc', consoleData.description);
 }
 
@@ -129,7 +150,7 @@ export function toggleFlipButton(show) {
 }
 
 /** 加载遮罩显示/隐藏 */
-export function setLoadingVisible(visible, text = '正在加载展品…') {
+export function setLoadingVisible(visible, text = 'Loading exhibit…') {
   const overlay = document.getElementById('loading-overlay');
   const textEl  = document.getElementById('loading-text');
   if (!overlay) return;

@@ -26,6 +26,7 @@
   --museum-text:     #e8e4dc;
   --museum-muted:    #7a7880;
   --navbar-h:        60px;
+  --bgm-bar-h:       40px;   /* 全站 BGM 播放器条高度（用于 hero calc 抵扣） */
 }
 
 /* ---------- 2. 全局 ---------- */
@@ -38,6 +39,82 @@ body {
   font-size: 14px;
   margin: 0;
   padding: 0;
+}
+
+/* ---------- 2.5. 全站 BGM 播放器条（顶部） ---------- */
+.bgm-bar {
+  position: sticky;
+  top: 0;
+  z-index: 1101;            /* 高于 Bootstrap navbar (1020) */
+  height: var(--bgm-bar-h);
+  background: rgba(15, 15, 18, 0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--museum-border, #2a2a35);
+  display: flex;
+  align-items: center;
+}
+.bgm-bar-inner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 0.78rem;
+  color: var(--museum-muted, #9090a0);
+  width: 100%;
+}
+.bgm-icon {
+  color: var(--museum-gold, #c9a84c);
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+.bgm-track {
+  flex: 1 1 auto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--museum-text, #e6e6ea);
+  min-width: 0;
+  letter-spacing: 0.02em;
+}
+.bgm-btn {
+  background: transparent;
+  border: 1px solid var(--museum-border, #2a2a35);
+  color: var(--museum-muted, #9090a0);
+  width: 30px;
+  height: 26px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  flex-shrink: 0;
+  padding: 0;
+}
+.bgm-btn:hover {
+  border-color: var(--museum-gold, #c9a84c);
+  color: var(--museum-gold, #c9a84c);
+  background: rgba(201, 168, 76, 0.08);
+}
+.bgm-volume-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--museum-muted, #9090a0);
+  flex-shrink: 0;
+}
+.bgm-volume-wrap input[type="range"] {
+  width: 80px;
+  accent-color: var(--museum-gold, #c9a84c);
+  cursor: pointer;
+}
+
+/* navbar (sticky-top) 让位给 bgm-bar */
+.museum-navbar.sticky-top { top: var(--bgm-bar-h); }
+
+@media (max-width: 480px) {
+  .bgm-volume-wrap input[type="range"] { width: 50px; }
+  .bgm-bar-inner { gap: 8px; }
 }
 
 /* ---------- 3. 导航栏（共用） ---------- */
@@ -103,7 +180,7 @@ body {
 /* ---------- 4. 落地页 Hero Banner（index.html） ---------- */
 .hero-landing {
   position: relative;
-  min-height: calc(100vh - var(--navbar-h));
+  min-height: calc(100vh - var(--navbar-h) - var(--bgm-bar-h));
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -274,6 +351,29 @@ body {
 .card-img-overlay-text { display: flex; align-items: center; justify-content: center; }
 .card-console-icon { font-size: 2.5rem; opacity: 0.25; color: #fff; }
 
+/* 卡片内嵌的 3D 预览 canvas（每张卡片一个独立 Three.js 场景） */
+.console-preview-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  position: absolute;
+  inset: 0;
+}
+
+/* 颜色拾取器：原生 <input type="color"> 隐藏在 .btn-hero-ctrl 标签里 */
+.btn-color-label { position: relative; cursor: pointer; }
+.btn-color-label input[type="color"] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+  background: none;
+}
+
 .card-year-badge {
   position: absolute;
   top: 10px; right: 10px;
@@ -351,7 +451,7 @@ body {
 #hero {
   position: relative;
   width: 100%;
-  height: calc(72vh - var(--navbar-h));
+  height: calc(72vh - var(--navbar-h) - var(--bgm-bar-h));
   min-height: 420px;
   background: var(--museum-bg);
   overflow: hidden;
@@ -633,7 +733,7 @@ body {
 /* ---------- 10. 响应式断点 ---------- */
 /* 中小屏：hero 高度调整 */
 @media (max-width: 992px) {
-  #hero { height: calc(65vh - var(--navbar-h)); }
+  #hero { height: calc(65vh - var(--navbar-h) - var(--bgm-bar-h)); }
 }
 
 @media (max-width: 768px) {
@@ -641,7 +741,7 @@ body {
   .hero-info { max-width: 190px; }
   .btn-hero-ctrl span { display: none; }
   .camera-bar-label { display: none; }
-  .hero-landing { min-height: calc(90vh - var(--navbar-h)); }
+  .hero-landing { min-height: calc(90vh - var(--navbar-h) - var(--bgm-bar-h)); }
 }
 
 @media (max-width: 576px) {
@@ -652,7 +752,7 @@ body {
 
 /* 大屏：落地页 hero 更宽敞 */
 @media (min-width: 1200px) {
-  #hero { height: calc(78vh - var(--navbar-h)); }
+  #hero { height: calc(78vh - var(--navbar-h) - var(--bgm-bar-h)); }
 }
 
 /* ---------- 11. 可访问性 ---------- */

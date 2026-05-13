@@ -1,18 +1,17 @@
 /* =============================================
-   About 页面专属样式
-   复用 main.css 中定义的 CSS 变量
+   About 页面专属样式（参照 Budget 项目结构改写）
+   复用 main.css 中定义的 CSS 变量和暗色博物馆主题
    ============================================= */
 
 :root {
-  --museum-bg: #0d0d0f;
-  --museum-surface: #16161a;
-  --museum-panel: #1c1c22;
-  --museum-border: #2a2a35;
-  --museum-gold: #c9a84c;
-  --museum-gold-dim: #8a7035;
-  --museum-text: #e8e4dc;
-  --museum-text-muted: #7a7880;
-  --navbar-height: 56px;
+  --museum-bg:        #0d0d0f;
+  --museum-surface:   #16161a;
+  --museum-panel:     #1c1c22;
+  --museum-border:    #2a2a35;
+  --museum-gold:      #c9a84c;
+  --museum-gold-dim:  #8a7035;
+  --museum-text:      #e8e4dc;
+  --museum-muted:     #7a7880;
 }
 
 html, body {
@@ -22,168 +21,290 @@ html, body {
   overflow-x: hidden;
 }
 
-/* 导航栏（复用 main.css 风格，此处重新声明以独立使用） */
-.museum-navbar {
-  background: linear-gradient(90deg, #0a0a0c 0%, #1a1a20 100%);
-  border-bottom: 1px solid var(--museum-border);
-}
-
-.museum-brand {
-  color: var(--museum-gold) !important;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-}
-
-/* 主体容器 */
+/* 主体容器（窄一些，长篇阅读更舒适） */
 .about-container {
-  max-width: 860px;
-  padding-top: calc(var(--navbar-height) + 2rem);
-  padding-bottom: 3rem;
+  max-width: 880px;
+  padding-top: 2.5rem;
+  padding-bottom: 4rem;
 }
 
-/* 页面标题 */
-.about-header {
-  margin-bottom: 3rem;
-}
-
-.about-header h1 {
-  color: var(--museum-gold);
-  font-size: 2.2rem;
+/* ---------- 通用：小标签 + 大标题 ---------- */
+.about-eyebrow {
+  font-size: 0.72rem;
   font-weight: 700;
-  margin-bottom: 0.5rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--museum-gold);
+  margin: 0 0 0.6rem;
 }
 
-.about-header .lead {
+/* ---------- Hero（页面顶部） ---------- */
+.about-hero {
+  margin-bottom: 4rem;
+}
+.about-title {
+  font-size: 2.4rem;
+  font-weight: 800;
+  line-height: 1.15;
   color: var(--museum-text);
-  font-size: 1.1rem;
+  margin: 0 0 1.2rem;
+  letter-spacing: -0.01em;
+}
+.about-lead {
+  font-size: 1rem;
+  color: var(--museum-muted);
+  line-height: 1.7;
+  max-width: 720px;
 }
 
-.about-header .text-muted {
-  color: var(--museum-text-muted) !important;
+/* ---------- 通用 block（每一大节） ---------- */
+.about-block {
+  margin-bottom: 4rem;
+}
+.about-block-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--museum-text);
+  margin: 0 0 1rem;
+  letter-spacing: -0.005em;
+}
+.about-block-intro {
+  font-size: 0.95rem;
+  color: var(--museum-muted);
+  line-height: 1.7;
+  margin: 0 0 1.8rem;
+  max-width: 720px;
 }
 
-/* 各章节 */
-.about-section {
-  margin-bottom: 2.5rem;
-  padding: 1.5rem;
+/* ---------- Process 卡片（图 + 文，垂直堆叠） ---------- */
+.process-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+.process-card {
   background: var(--museum-surface);
   border: 1px solid var(--museum-border);
-  border-radius: 8px;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: border-color 0.2s;
 }
-
-.about-section h2 {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--museum-gold);
-  margin-bottom: 1rem;
+.process-card:hover {
+  border-color: var(--museum-gold-dim);
+}
+.process-figure {
+  margin: 0;
+  background: linear-gradient(135deg, #1a1a22 0%, #0e0e12 100%);
+  /* 图片占位：未放置图片时显示渐变方块 + 中央文字 */
+  position: relative;
+  min-height: 240px;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: center;
 }
-
-.about-section h3 {
-  font-size: 0.95rem;
-  font-weight: 600;
+.process-figure::before {
+  content: 'Image placeholder';
+  position: absolute;
+  color: var(--museum-muted);
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  z-index: 0;
+}
+.process-figure img {
+  width: 100%;
+  height: auto;
+  max-height: 380px;
+  object-fit: cover;
+  display: block;
+  position: relative;
+  z-index: 1;
+  /* 图片加载失败时仍透出占位文字 */
+  background: var(--museum-panel);
+}
+.process-figure img[alt]:after {
+  /* 兜底：损坏图标隐藏 */
+  content: '';
+}
+.process-body {
+  padding: 1.4rem 1.6rem 1.6rem;
+}
+.process-step {
+  font-size: 1.15rem;
+  font-weight: 700;
   color: var(--museum-text);
-  margin: 1rem 0 0.5rem;
+  margin: 0 0 0.6rem;
 }
-
-.about-section p,
-.about-section li {
-  color: var(--museum-text-muted);
-  font-size: 0.88rem;
-  line-height: 1.65;
-}
-
-.about-section ul {
-  padding-left: 1.2rem;
-}
-
-/* 技术决策定义列表 */
-.tech-list {
-  display: grid;
-  grid-template-columns: 160px 1fr;
-  gap: 0.6rem 1rem;
-  align-items: start;
-}
-
-.tech-list dt {
-  color: var(--museum-gold);
-  font-weight: 600;
-  font-size: 0.85rem;
-  padding-top: 0.1rem;
-}
-
-.tech-list dd {
-  color: var(--museum-text-muted);
-  font-size: 0.85rem;
-  line-height: 1.6;
+.process-body p {
+  font-size: 0.9rem;
+  color: var(--museum-muted);
+  line-height: 1.7;
   margin: 0;
 }
 
-/* 引用卡片 */
-.credit-card {
-  background: var(--museum-panel);
+/* ---------- Tools 卡片（3 列网格） ---------- */
+.tool-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+}
+.tool-card {
+  background: var(--museum-surface);
   border: 1px solid var(--museum-border);
-  border-radius: 6px;
-  padding: 1rem;
-  margin-bottom: 0.8rem;
+  border-radius: 10px;
+  padding: 1.4rem 1.4rem 1.5rem;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.tool-card:hover {
+  border-color: var(--museum-gold-dim);
+}
+.tool-card h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--museum-gold);
+  margin: 0 0 0.7rem;
+}
+.tool-card p {
+  font-size: 0.88rem;
+  color: var(--museum-muted);
+  line-height: 1.65;
+  margin: 0;
 }
 
-.credit-card h3 {
-  margin-top: 0;
-  color: var(--museum-text) !important;
+/* ---------- Challenges 卡片（2 列网格） ---------- */
+.challenge-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+.challenge-card {
+  background: var(--museum-surface);
+  border: 1px solid var(--museum-border);
+  border-radius: 10px;
+  padding: 1.3rem 1.4rem 1.4rem;
+  transition: border-color 0.2s;
+}
+.challenge-card:hover {
+  border-color: var(--museum-gold-dim);
+}
+.challenge-card h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--museum-text);
+  margin: 0 0 0.6rem;
+}
+.challenge-card p {
+  font-size: 0.86rem;
+  color: var(--museum-muted);
+  line-height: 1.65;
+  margin: 0;
 }
 
-.credit-card a {
+/* ---------- Structure 卡片（3 列网格） ---------- */
+.structure-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+}
+.structure-card {
+  background: var(--museum-surface);
+  border: 1px solid var(--museum-border);
+  border-radius: 10px;
+  padding: 1.3rem 1.4rem 1.4rem;
+  transition: border-color 0.2s;
+}
+.structure-card:hover {
+  border-color: var(--museum-gold-dim);
+}
+.structure-card h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--museum-gold);
+  margin: 0 0 0.6rem;
+}
+.structure-card p {
+  font-size: 0.86rem;
+  color: var(--museum-muted);
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* ---------- Submission links list ---------- */
+.links-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+.links-list li {
+  display: flex;
+  gap: 1rem;
+  background: var(--museum-surface);
+  border: 1px solid var(--museum-border);
+  border-radius: 10px;
+  padding: 1rem 1.2rem;
+  align-items: flex-start;
+  transition: border-color 0.2s;
+}
+.links-list li:hover { border-color: var(--museum-gold-dim); }
+.links-list i {
+  color: var(--museum-gold);
+  font-size: 1.2rem;
+  margin-top: 0.15rem;
+  flex-shrink: 0;
+}
+.links-list strong {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--museum-text);
+  margin-bottom: 0.3rem;
+}
+.links-list a {
   color: var(--museum-gold);
   text-decoration: none;
+  font-size: 0.86rem;
+  word-break: break-all;
 }
+.links-list a:hover { text-decoration: underline; }
 
-.credit-card a:hover {
-  text-decoration: underline;
-}
-
-/* 测试记录表格 */
-.test-table {
-  background: var(--museum-panel);
-  border-color: var(--museum-border);
-  font-size: 0.85rem;
-  border-radius: 6px;
-  overflow: hidden;
-}
-
-.table-dark {
-  --bs-table-bg: var(--museum-panel);
-  --bs-table-striped-bg: var(--museum-surface);
-  --bs-table-border-color: var(--museum-border);
-  color: var(--museum-text-muted);
-}
-
-/* 页脚 */
+/* ---------- Footer ---------- */
 .about-footer {
-  padding: 1.5rem;
+  padding: 2rem 1.5rem;
   border-top: 1px solid var(--museum-border);
-  color: var(--museum-text-muted);
+  color: var(--museum-muted);
   font-size: 0.82rem;
   background: var(--museum-panel);
   margin-top: 1rem;
+  line-height: 1.6;
 }
-
 .about-footer a {
   color: var(--museum-gold);
   text-decoration: none;
 }
+.about-footer a:hover { text-decoration: underline; }
 
-:focus-visible {
-  outline: 2px solid var(--museum-gold);
-  outline-offset: 2px;
-}
-
+/* ---------- 内联代码样式 ---------- */
 code {
   background: var(--museum-bg);
   color: var(--museum-gold);
   padding: 0.1em 0.35em;
   border-radius: 3px;
-  font-size: 0.85em;
+  font-size: 0.88em;
+  font-family: 'Consolas', 'Monaco', monospace;
+}
+
+/* ---------- 可访问性 ---------- */
+:focus-visible {
+  outline: 2px solid var(--museum-gold);
+  outline-offset: 2px;
+}
+
+/* ---------- 响应式 ---------- */
+@media (max-width: 576px) {
+  .about-title       { font-size: 1.9rem; }
+  .about-block-title { font-size: 1.4rem; }
+  .about-container   { padding-top: 1.5rem; padding-bottom: 2.5rem; }
+  .process-figure    { min-height: 180px; }
 }

@@ -26,6 +26,18 @@ export function loadConsoleModel(consoleData, onProgress) {
         centerAndScale(model);
         model.userData.consoleId = consoleData.id;
         model.userData.isRealModel = true;
+        // 保留 GLTF 内嵌动画（AnimationMixer 在 viewer.js / previewViewer.js 中创建）
+        model.userData.animations = gltf.animations ?? [];
+
+        // 调试输出：mesh 名称 + 动画 clip 名称
+        const meshNames = [];
+        model.traverse((child) => { if (child.isMesh) meshNames.push(child.name || '(unnamed)'); });
+        console.info(`[loader] ${consoleData.id} 模型网格:`, meshNames);
+        console.info(
+          `[loader] ${consoleData.id} 动画 clips:`,
+          gltf.animations.map((c) => `"${c.name}" (${c.duration.toFixed(2)}s)`),
+        );
+
         resolve(model);
       },
       (event) => {

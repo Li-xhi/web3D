@@ -52,3 +52,52 @@ export function setWireframe(model, enabled) {
     }
   });
 }
+
+/* ---- 颜色变换：在首次调用时缓存原始颜色，之后可恢复 ---- */
+function ensureOriginalColors(model) {
+  if (model.userData.colorsCached) return;
+  model.userData.colorsCached = true;
+  model.traverse((child) => {
+    if (child.isMesh) {
+      const mats = Array.isArray(child.material) ? child.material : [child.material];
+      mats.forEach((m) => {
+        if (m.color) m.userData.originalColor = m.color.clone();
+      });
+    }
+  });
+}
+
+/**
+ * 给模型整体染色（乘性 tint，保留贴图细节）
+ * @param {THREE.Object3D} model
+ * @param {string} colorHex - 例如 "#ff8800"
+ */
+export function tintModel(model, colorHex) {
+  if (!model) return;
+  ensureOriginalColors(model);
+  const target = new THREE.Color(colorHex);
+  model.traverse((child) => {
+    if (child.isMesh) {
+      const mats = Array.isArray(child.material) ? child.material : [child.material];
+      mats.forEach((m) => { if (m.color) m.color.copy(target); });
+    }
+  });
+}
+
+/**
+ * 恢复模型原始颜色
+ * @param {THREE.Object3D} model
+ */
+export function resetModelColors(model) {
+  if (!model || !model.userData.colorsCached) return;
+  model.traverse((child) => {
+    if (child.isMesh) {
+      const mats = Array.isArray(child.material) ? child.material : [child.material];
+      mats.forEach((m) => {
+        if (m.color && m.userData.originalColor) {
+          m.color.copy(m.userData.originalColor);
+        }
+      });
+    }
+  });
+}

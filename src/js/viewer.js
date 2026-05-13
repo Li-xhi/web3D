@@ -16,6 +16,8 @@ import {
   animateFlip,
   animateButtonPress,
   animateScreenOn,
+  setupFlipAction,
+  playFlipAction,
 } from './view/animations.js';
 import {
   bindSceneButtons,
@@ -24,8 +26,8 @@ import {
   toggleFlipButton,
   setLoadingVisible,
 } from './controller/ui.js';
-import { setWireframe, bindModelInteraction } from './controller/interaction.js';
-import { loadBgm, setBgmPlaying } from './controller/audio.js';
+import { setWireframe, bindModelInteraction, tintModel, resetModelColors } from './controller/interaction.js';
+// BGM 由顶部全局播放器（bgmInit.js + bgmPlayer.js）统一管理，不再使用 audio.js
 
 /* =============================================
    页面初始化
@@ -46,10 +48,12 @@ async function initViewer() {
   /* ---- 共享状态 ---- */
   const state = {
     currentModel: null,
+    mixer:        null,        // AnimationMixer（真实 GLB 才会创建）
+    flipAction:   null,        // 翻盖 AnimationAction
     isWireframe:  false,
     isMainLightOn: true,
     isBgmPlaying: false,
-    isFlipOpen:   false,
+    isFlipOpen:   true,        // 模型默认加载为"打开"姿态（动画第 0 帧）
     isScreenOn:   false,
     clock:        new THREE.Clock(),
   };
@@ -68,15 +72,25 @@ async function initViewer() {
       state.isMainLightOn = on;
       lights.mainLight.visible = on;
     },
-    onBgmToggle: (on) => {
-      state.isBgmPlaying = on;
-      setBgmPlaying(on);
-    },
+    /* BGM 由顶部全局播放器接管，本页不再绑定 onBgmToggle */
     onFlip: (open) => {
       state.isFlipOpen = open;
+      // 优先使用 GLTF 内嵌动画（真实 GLB）
+      if (state.flipAction) {
+        playFlipAction(state.flipAction, open);
+        return;
+      }
+      // 占位方块兜底：旋转名为 'lid' 的 mesh
       const lid = state.currentModel?.getObjectByName('lid');
       if (lid) animateFlip(lid, open);
     },
+    onAutoRotateToggle: (on) => {
+      controls.autoRotate = on;
+      controls.autoRotateSpeed = 2.0;
+    },
+    onColorChange: (hex) => tintModel(state.currentModel, hex),
+    onColorReset:  ()    => resetModelColors(state.currentModel),
+    getFlipState:  ()    => state.isFlipOpen,
   });
 
   /* ---- 绑定模型点击（屏幕开机 / 按键按下） ---- */
@@ -91,23 +105,39 @@ async function initViewer() {
   });
 
   /* ---- 加载模型 ---- */
-  setLoadingVisible(true, `正在加载 ${consoleData.name}…`);
+  setLoadingVisible(true, `Loading ${consoleData.name}…`);
 
   state.currentModel = await loadConsoleModel(consoleData, (progress) => {
-    setLoadingVisible(true, `加载中 ${Math.round(progress * 100)}%…`);
+    setLoadingVisible(true, `Loading ${Math.round(progress * 100)}%…`);
   });
   scene.add(state.currentModel);
 
+  /* ---- 配置 GLTF 内嵌动画（如有） ---- */
+  const clips = state.currentModel.userData.animations ?? [];
+  if (clips.length > 0) {
+    state.mixer = new THREE.AnimationMixer(state.currentModel);
+    // 优先匹配名字含 flip/lid/open/close 的 clip，否则用第一个
+    const flipClip =
+      clips.find((c) => /flip|lid|open|close/i.test(c.name)) ?? clips[0];
+    state.flipAction = setupFlipAction(state.mixer, flipClip);
+    console.info('[viewer] 已绑定翻盖动画 clip:', flipClip.name);
+  }
+
   /* ---- 更新 UI ---- */
   updateConsoleInfo(consoleData);
-  updateCameraPresets(consoleData, (preset) =>
-    animateCameraToPreset(camera, controls, preset)
-  );
+  updateCameraPresets(consoleData, (preset) => {
+    animateCameraToPreset(camera, controls, preset);
+    // 相机预设可附带 flipState='open'|'closed'，驱动翻盖动画到对应姿态
+    if (preset.flipState && state.flipAction) {
+      const wantOpen = preset.flipState === 'open';
+      if (wantOpen !== state.isFlipOpen) {
+        state.isFlipOpen = wantOpen;
+        playFlipAction(state.flipAction, wantOpen);
+      }
+    }
+  });
   toggleFlipButton(!!consoleData.hasFlipAnimation);
   animateCameraToPreset(camera, controls, consoleData.cameraPresets[0]);
-
-  /* ---- 加载 BGM（不自动播放，等用户点击） ---- */
-  loadBgm(consoleData.bgm);
 
   setLoadingVisible(false);
 
@@ -127,6 +157,9 @@ async function initViewer() {
     if (state.currentModel && !state.currentModel.userData.isRealModel) {
       state.currentModel.rotation.y += delta * 0.5;
     }
+
+    /* 推进 AnimationMixer（翻盖动画） */
+    state.mixer?.update(delta);
 
     controls.update();
     composer.render(delta);

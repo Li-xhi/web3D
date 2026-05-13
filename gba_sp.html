@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,8 +11,26 @@
 </head>
 <body data-console-id="gba_sp">
 
-  <!-- ===== 导航栏 ===== -->
-  <nav class="navbar navbar-expand-lg navbar-dark museum-navbar sticky-top" aria-label="主导航">
+  <!-- ===== Global BGM Player ===== -->
+  <div class="bgm-bar" role="region" aria-label="Background music player">
+    <div class="container-fluid bgm-bar-inner">
+      <i class="bi bi-music-note-beamed bgm-icon" aria-hidden="true"></i>
+      <span class="bgm-track" id="bgm-track">—</span>
+      <button class="bgm-btn" id="bgm-play" aria-label="Play">
+        <i class="bi bi-play-fill" aria-hidden="true"></i>
+      </button>
+      <button class="bgm-btn" id="bgm-next" aria-label="Next track" title="Next track">
+        <i class="bi bi-skip-end-fill" aria-hidden="true"></i>
+      </button>
+      <div class="bgm-volume-wrap" title="Volume">
+        <i class="bi bi-volume-down-fill" aria-hidden="true"></i>
+        <input type="range" id="bgm-volume" min="0" max="1" step="0.01" value="0.5" aria-label="Volume" />
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Navbar ===== -->
+  <nav class="navbar navbar-expand-lg navbar-dark museum-navbar sticky-top" aria-label="Main navigation">
     <div class="container-fluid">
       <a class="navbar-brand museum-brand" href="index.html">
         <i class="bi bi-controller" aria-hidden="true"></i>
@@ -21,19 +39,19 @@
 
       <button class="navbar-toggler" type="button"
         data-bs-toggle="collapse" data-bs-target="#navGbaSp"
-        aria-controls="navGbaSp" aria-expanded="false" aria-label="展开导航菜单">
+        aria-controls="navGbaSp" aria-expanded="false" aria-label="Toggle navigation menu">
         <span class="navbar-toggler-icon"></span>
       </button>
 
       <div class="collapse navbar-collapse" id="navGbaSp">
         <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
           <li class="nav-item">
-            <a class="nav-link" href="index.html">主页</a>
+            <a class="nav-link" href="index.html">Home</a>
           </li>
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle active" href="#" id="consolesDropdown"
               role="button" data-bs-toggle="dropdown" aria-expanded="false"
-              aria-current="page">展品</a>
+              aria-current="page">Exhibits</a>
             <ul class="dropdown-menu dropdown-menu-dark museum-dropdown" aria-labelledby="consolesDropdown">
               <li><a class="dropdown-item" href="gameboy.html">
                 <span class="dropdown-year">1989</span> Game Boy
@@ -55,59 +73,68 @@
   </nav>
 
 
-  <!-- ===== 3D 展示 Hero ===== -->
-  <section id="hero" aria-label="GBA SP 3D 交互展示">
-    <canvas id="three-canvas" aria-label="Game Boy Advance SP 3D 模型，可拖拽旋转、滚轮缩放"></canvas>
+  <!-- ===== 3D Showcase Hero ===== -->
+  <section id="hero" aria-label="GBA SP 3D interactive showcase">
+    <canvas id="three-canvas" aria-label="Game Boy Advance SP 3D model — drag to rotate, scroll to zoom"></canvas>
 
-    <div class="hero-controls" role="group" aria-label="场景控制">
-      <button id="btn-wireframe" class="btn-hero-ctrl" aria-pressed="false" title="线框模式">
+    <div class="hero-controls" role="group" aria-label="Scene controls">
+      <button id="btn-wireframe" class="btn-hero-ctrl" aria-pressed="false" title="Wireframe mode">
         <i class="bi bi-grid-3x3" aria-hidden="true"></i>
-        <span>线框</span>
+        <span>Wireframe</span>
       </button>
-      <button id="btn-light" class="btn-hero-ctrl active" aria-pressed="true" title="主光源">
+      <button id="btn-light" class="btn-hero-ctrl active" aria-pressed="true" title="Main light">
         <i class="bi bi-lightbulb-fill" aria-hidden="true"></i>
-        <span>主光</span>
+        <span>Light</span>
       </button>
-      <button id="btn-bgm" class="btn-hero-ctrl" aria-pressed="false" title="背景音乐">
-        <i class="bi bi-music-note-beamed" aria-hidden="true"></i>
-        <span>BGM</span>
-      </button>
-      <!-- GBA SP 有翻盖，viewer.js 会自动显示此按钮 -->
-      <button id="btn-flip" class="btn-hero-ctrl d-none" aria-label="翻盖动画" title="翻盖（GBA SP 专属）">
+<!-- GBA SP has a flip lid; viewer.js will reveal this button -->
+      <button id="btn-flip" class="btn-hero-ctrl d-none" aria-label="Flip animation" title="Flip lid (GBA SP only)">
         <i class="bi bi-arrow-repeat" aria-hidden="true"></i>
-        <span>翻盖</span>
+        <span>Flip</span>
+      </button>
+      <button id="btn-rotate" class="btn-hero-ctrl" aria-pressed="false" title="Auto-rotate">
+        <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
+        <span>Rotate</span>
+      </button>
+      <label class="btn-hero-ctrl btn-color-label" title="Change tint">
+        <i class="bi bi-palette" aria-hidden="true"></i>
+        <span>Color</span>
+        <input id="btn-color" type="color" value="#ffffff" aria-label="Pick model tint" />
+      </label>
+      <button id="btn-color-reset" class="btn-hero-ctrl" title="Reset tint" aria-label="Reset color">
+        <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+        <span>Reset</span>
       </button>
     </div>
 
     <div class="hero-info" aria-live="polite">
       <p class="hero-info-name" id="info-name">GBA SP</p>
-      <p class="hero-info-meta" id="info-year">2003 年</p>
-      <p class="hero-info-desc" id="info-desc">正在加载…</p>
+      <p class="hero-info-meta" id="info-year">Released 2003</p>
+      <p class="hero-info-desc" id="info-desc">Loading…</p>
     </div>
 
     <div id="loading-overlay" class="loading-overlay" aria-live="polite">
       <div class="loading-content">
         <div class="loading-spinner" aria-hidden="true"></div>
-        <p id="loading-text" class="loading-text">正在加载 GBA SP…</p>
+        <p id="loading-text" class="loading-text">Loading GBA SP…</p>
       </div>
     </div>
   </section>
 
 
-  <!-- ===== 相机视角控制栏 ===== -->
+  <!-- ===== Camera preset bar ===== -->
   <div class="camera-bar">
     <div class="container-fluid">
       <div class="camera-bar-inner">
         <span class="camera-bar-label">
-          <i class="bi bi-camera-video" aria-hidden="true"></i> 视角
+          <i class="bi bi-camera-video" aria-hidden="true"></i> View
         </span>
-        <div id="camera-presets" class="camera-presets-row" role="group" aria-label="相机预设视角"></div>
+        <div id="camera-presets" class="camera-presets-row" role="group" aria-label="Camera preset views"></div>
       </div>
     </div>
   </div>
 
 
-  <!-- ===== 展品详情区 ===== -->
+  <!-- ===== Exhibit detail section ===== -->
   <section class="console-detail-section" aria-labelledby="detail-heading">
     <div class="container">
       <div class="row g-4 align-items-start">
@@ -118,18 +145,19 @@
             <span class="detail-year">2003</span>
           </h2>
           <p class="detail-desc">
-            GB 系列最重要的一次革新。翻盖外壳保护屏幕，前置 LED 背光解决了原版暗屏痛点，
-            内置锂电池（充电约 3 小时，续航约 18 小时）取代了 AA 电池。
-            金属漆面与铰链结构至今仍被玩家称赞为"最耐用的掌机设计"。
+            The most significant revision of the GB line. Its clamshell shell protects the screen,
+            a frontlit LED display finally solves the dim-screen problem of the original GBA, and
+            a built-in lithium battery (~3 hours to charge, ~18 hours of play) replaces AA cells.
+            Players still praise its painted metal finish and hinge as "the most durable handheld design ever made".
           </p>
-          <table class="table table-dark detail-specs" aria-label="GBA SP 规格参数">
+          <table class="table table-dark detail-specs" aria-label="GBA SP specifications">
             <tbody>
               <tr><th scope="row">CPU</th><td>ARM7TDMI @ 16.78 MHz</td></tr>
-              <tr><th scope="row">显示</th><td>240×160 TFT LCD（前置背光）</td></tr>
-              <tr><th scope="row">电池</th><td>内置锂电，约 18 小时</td></tr>
-              <tr><th scope="row">重量</th><td>143 g（合盖）</td></tr>
-              <tr><th scope="row">材质</th><td>金属漆 ABS 翻盖机身</td></tr>
-              <tr><th scope="row">售价（发售时）</th><td>¥12,500（日本）</td></tr>
+              <tr><th scope="row">Display</th><td>240×160 TFT LCD (frontlit)</td></tr>
+              <tr><th scope="row">Battery</th><td>Built-in lithium-ion, ~18 hours</td></tr>
+              <tr><th scope="row">Weight</th><td>143 g (closed)</td></tr>
+              <tr><th scope="row">Material</th><td>Metallic-painted ABS clamshell</td></tr>
+              <tr><th scope="row">Launch price</th><td>¥12,500 (Japan)</td></tr>
             </tbody>
           </table>
         </div>
@@ -137,18 +165,21 @@
         <div class="col-md-6">
           <div class="interaction-guide">
             <h3 class="guide-title">
-              <i class="bi bi-hand-index-thumb" aria-hidden="true"></i> 交互指南
+              <i class="bi bi-hand-index-thumb" aria-hidden="true"></i> Interaction Guide
             </h3>
             <ul class="guide-list">
-              <li><i class="bi bi-mouse" aria-hidden="true"></i> 拖拽旋转模型</li>
-              <li><i class="bi bi-zoom-in" aria-hidden="true"></i> 滚轮缩放</li>
-              <li><i class="bi bi-arrow-repeat" aria-hidden="true"></i> 点击"翻盖"查看开合动画</li>
-              <li><i class="bi bi-grid-3x3" aria-hidden="true"></i> 线框模式查看几何结构</li>
-              <li><i class="bi bi-music-note-beamed" aria-hidden="true"></i> 播放 Pokémon BGM</li>
-              <li><i class="bi bi-cursor" aria-hidden="true"></i> 点击屏幕区域"开机"</li>
+              <li><i class="bi bi-mouse" aria-hidden="true"></i> Drag to rotate the model</li>
+              <li><i class="bi bi-zoom-in" aria-hidden="true"></i> Scroll wheel to zoom in/out</li>
+              <li><i class="bi bi-arrow-repeat" aria-hidden="true"></i> <strong>Flip</strong> &mdash; play the lid open/close animation (forwards = close, again = re-open)</li>
+              <li><i class="bi bi-camera-video" aria-hidden="true"></i> <strong>Closed</strong> / <strong>Open</strong> camera presets also drive the flip animation</li>
+              <li><i class="bi bi-grid-3x3" aria-hidden="true"></i> <strong>Wireframe</strong> &mdash; inspect the underlying mesh</li>
+              <li><i class="bi bi-lightbulb" aria-hidden="true"></i> <strong>Light</strong> &mdash; toggle the main directional light</li>
+              <li><i class="bi bi-arrow-clockwise" aria-hidden="true"></i> <strong>Rotate</strong> &mdash; auto-rotate the camera around the model</li>
+              <li><i class="bi bi-palette" aria-hidden="true"></i> <strong>Color</strong> &mdash; tint the model; <strong>Reset</strong> restores the original colours</li>
+              <li><i class="bi bi-music-note-beamed" aria-hidden="true"></i> Use the top bar to play / pause / skip / adjust the museum BGM</li>
             </ul>
             <div class="guide-nav">
-              <span class="guide-nav-label">切换展品：</span>
+              <span class="guide-nav-label">Switch exhibit:</span>
               <a href="gameboy.html" class="btn btn-nav-console">&larr; Game Boy</a>
               <a href="psp.html"     class="btn btn-nav-console">PSP &rarr;</a>
             </div>
@@ -160,26 +191,28 @@
   </section>
 
 
-  <!-- ===== 页脚 ===== -->
+  <!-- ===== Footer ===== -->
   <footer class="museum-footer" role="contentinfo">
     <div class="container-fluid">
       <div class="footer-inner">
         <div class="footer-copyright">
           <p>&copy; 2026 Handheld Heritage &mdash; University of Sussex 3D Apps</p>
         </div>
-        <div class="footer-social" aria-label="外部链接">
+        <div class="footer-social" aria-label="External links">
           <a href="https://github.com" target="_blank" rel="noopener" aria-label="GitHub">
             <i class="bi bi-github" aria-hidden="true"></i>
           </a>
           <a href="#" aria-label="Twitter / X"><i class="bi bi-twitter-x" aria-hidden="true"></i></a>
           <a href="#" aria-label="Instagram"><i class="bi bi-instagram" aria-hidden="true"></i></a>
-          <a href="about.html" aria-label="关于"><i class="bi bi-info-circle" aria-hidden="true"></i></a>
+          <a href="about.html" aria-label="About"><i class="bi bi-info-circle" aria-hidden="true"></i></a>
         </div>
       </div>
     </div>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- 全站共用 BGM 播放器（顶部条） -->
+  <script type="module" src="/src/js/bgmInit.js"></script>
   <script type="module" src="/src/js/viewer.js"></script>
 </body>
 </html>

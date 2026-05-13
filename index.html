@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Handheld Heritage — 复古掌机 3D 博物馆</title>
+  <title>Handheld Heritage — Retro Handheld 3D Museum</title>
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
@@ -11,8 +11,26 @@
 </head>
 <body>
 
-  <!-- ===== 导航栏 ===== -->
-  <nav class="navbar navbar-expand-lg navbar-dark museum-navbar sticky-top" aria-label="主导航">
+  <!-- ===== Global BGM Player (shared across pages, state persists via sessionStorage) ===== -->
+  <div class="bgm-bar" role="region" aria-label="Background music player">
+    <div class="container-fluid bgm-bar-inner">
+      <i class="bi bi-music-note-beamed bgm-icon" aria-hidden="true"></i>
+      <span class="bgm-track" id="bgm-track">—</span>
+      <button class="bgm-btn" id="bgm-play" aria-label="Play">
+        <i class="bi bi-play-fill" aria-hidden="true"></i>
+      </button>
+      <button class="bgm-btn" id="bgm-next" aria-label="Next track" title="Next track">
+        <i class="bi bi-skip-end-fill" aria-hidden="true"></i>
+      </button>
+      <div class="bgm-volume-wrap" title="Volume">
+        <i class="bi bi-volume-down-fill" aria-hidden="true"></i>
+        <input type="range" id="bgm-volume" min="0" max="1" step="0.01" value="0.5" aria-label="Volume" />
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Navbar ===== -->
+  <nav class="navbar navbar-expand-lg navbar-dark museum-navbar sticky-top" aria-label="Main navigation">
     <div class="container-fluid">
       <a class="navbar-brand museum-brand" href="index.html">
         <i class="bi bi-controller" aria-hidden="true"></i>
@@ -21,18 +39,18 @@
 
       <button class="navbar-toggler" type="button"
         data-bs-toggle="collapse" data-bs-target="#navMain"
-        aria-controls="navMain" aria-expanded="false" aria-label="展开导航菜单">
+        aria-controls="navMain" aria-expanded="false" aria-label="Toggle navigation menu">
         <span class="navbar-toggler-icon"></span>
       </button>
 
       <div class="collapse navbar-collapse" id="navMain">
         <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
           <li class="nav-item">
-            <a class="nav-link active" href="index.html" aria-current="page">主页</a>
+            <a class="nav-link active" href="index.html" aria-current="page">Home</a>
           </li>
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="consolesDropdown"
-              role="button" data-bs-toggle="dropdown" aria-expanded="false">展品</a>
+              role="button" data-bs-toggle="dropdown" aria-expanded="false">Exhibits</a>
             <ul class="dropdown-menu dropdown-menu-dark museum-dropdown" aria-labelledby="consolesDropdown">
               <li><a class="dropdown-item" href="gameboy.html">
                 <span class="dropdown-year">1989</span> Game Boy
@@ -54,9 +72,9 @@
   </nav>
 
 
-  <!-- ===== Hero Banner（落地页全屏标题区） ===== -->
-  <section class="hero-landing" aria-label="博物馆入口">
-    <!-- CSS 装饰背景（三台掌机配色光晕） -->
+  <!-- ===== Hero Banner (full-screen landing) ===== -->
+  <section class="hero-landing" aria-label="Museum entrance">
+    <!-- Decorative background orbs (one per console palette) -->
     <div class="hero-landing-bg" aria-hidden="true">
       <span class="orb orb-gb"></span>
       <span class="orb orb-sp"></span>
@@ -66,47 +84,45 @@
     <div class="container hero-landing-content text-center">
       <p class="hero-eyebrow">Interactive 3D Museum</p>
       <h1 class="hero-title">Handheld Heritage</h1>
-      <p class="hero-tagline">掌机演化的故事 &nbsp;·&nbsp; 1989 — 2004</p>
+      <p class="hero-tagline">The Evolution of Portable Gaming &nbsp;·&nbsp; 1989 — 2004</p>
       <p class="hero-desc">
         Game Boy &rarr; Game Boy Advance SP &rarr; PlayStation Portable<br>
-        三代经典便携游戏机，三种截然不同的材质与美学
+        Three iconic portable consoles, three distinct materials and aesthetics
       </p>
       <a href="#consoles-section" class="btn btn-explore">
-        探索展品 <i class="bi bi-arrow-down" aria-hidden="true"></i>
+        Explore Exhibits <i class="bi bi-arrow-down" aria-hidden="true"></i>
       </a>
     </div>
 
-    <!-- 向下滚动提示箭头 -->
-    <a href="#consoles-section" class="scroll-hint" aria-label="向下滚动">
+    <!-- Scroll-down hint arrow -->
+    <a href="#consoles-section" class="scroll-hint" aria-label="Scroll down">
       <i class="bi bi-chevron-double-down" aria-hidden="true"></i>
     </a>
   </section>
 
 
-  <!-- ===== 展品卡片画廊（Lab1 三列 Bootstrap Cards） ===== -->
+  <!-- ===== Exhibit card gallery (Lab1 three-column Bootstrap cards) ===== -->
   <section id="consoles-section" class="consoles-section" aria-labelledby="consoles-heading">
     <div class="container">
 
-      <h2 class="section-title text-center" id="consoles-heading">展品画廊</h2>
-      <p class="section-subtitle text-center">选择展品进入独立的 3D 交互体验页面</p>
+      <h2 class="section-title text-center" id="consoles-heading">Exhibit Gallery</h2>
+      <p class="section-subtitle text-center">Choose an exhibit to enter its dedicated 3D interactive page</p>
 
       <div class="row g-4 justify-content-center">
 
-        <!-- Game Boy 卡片 -->
+        <!-- Game Boy card -->
         <div class="col-lg-4 col-md-6 col-sm-10">
           <div class="card museum-card h-100">
             <div class="console-card-img gameboy-img" aria-hidden="true">
-              <div class="card-img-overlay-text">
-                <span class="card-console-icon">&#9632;</span>
-              </div>
+              <canvas class="console-preview-canvas" data-console-id="gameboy"></canvas>
               <span class="card-year-badge">1989</span>
             </div>
             <div class="card-body">
               <h5 class="card-title">Game Boy</h5>
               <p class="card-manufacturer">Nintendo</p>
-              <p class="card-text">掌机黄金时代的开端。8-bit CPU、单色 LCD、5 节 AA 电池能撑 30 小时。Tetris 让它走进千家万户。</p>
+              <p class="card-text">The dawn of the handheld golden era. 8-bit CPU, monochrome LCD, and roughly 30 hours of play on 4 AA batteries. Tetris carried it into millions of homes.</p>
               <div class="card-tags">
-                <span class="badge card-tag">哑光灰塑料</span>
+                <span class="badge card-tag">Matte Grey Plastic</span>
                 <span class="badge card-tag">8-bit</span>
                 <span class="badge card-tag">Tetris</span>
               </div>
@@ -114,55 +130,51 @@
             <div class="card-footer">
               <a href="gameboy.html" class="btn btn-load w-100">
                 <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i>
-                进入 3D 展示
+                Enter 3D Showcase
               </a>
             </div>
           </div>
         </div>
 
-        <!-- GBA SP 卡片 -->
+        <!-- GBA SP card -->
         <div class="col-lg-4 col-md-6 col-sm-10">
           <div class="card museum-card h-100">
             <div class="console-card-img gbasp-img" aria-hidden="true">
-              <div class="card-img-overlay-text">
-                <span class="card-console-icon">&#9650;</span>
-              </div>
+              <canvas class="console-preview-canvas" data-console-id="gba_sp"></canvas>
               <span class="card-year-badge">2003</span>
             </div>
             <div class="card-body">
               <h5 class="card-title">Game Boy Advance SP</h5>
               <p class="card-manufacturer">Nintendo</p>
-              <p class="card-text">第一台带前置背光的 GB 系列掌机。翻盖设计、可充电锂电池、金属漆面机身。</p>
+              <p class="card-text">The first GB-series handheld with a frontlit display. Clamshell design, rechargeable lithium battery, and a metallic-painted body.</p>
               <div class="card-tags">
-                <span class="badge card-tag">金属漆</span>
-                <span class="badge card-tag">翻盖</span>
-                <span class="badge card-tag">背光</span>
+                <span class="badge card-tag">Metallic Paint</span>
+                <span class="badge card-tag">Clamshell</span>
+                <span class="badge card-tag">Frontlit</span>
               </div>
             </div>
             <div class="card-footer">
               <a href="gba_sp.html" class="btn btn-load w-100">
                 <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i>
-                进入 3D 展示
+                Enter 3D Showcase
               </a>
             </div>
           </div>
         </div>
 
-        <!-- PSP 卡片 -->
+        <!-- PSP card -->
         <div class="col-lg-4 col-md-6 col-sm-10">
           <div class="card museum-card h-100">
             <div class="console-card-img psp-img" aria-hidden="true">
-              <div class="card-img-overlay-text">
-                <span class="card-console-icon">&#9679;</span>
-              </div>
+              <canvas class="console-preview-canvas" data-console-id="psp"></canvas>
               <span class="card-year-badge">2004</span>
             </div>
             <div class="card-body">
               <h5 class="card-title">PlayStation Portable</h5>
               <p class="card-manufacturer">Sony</p>
-              <p class="card-text">索尼挑战任天堂掌机霸权之作。4.3 寸宽屏、UMD 光盘、Wi-Fi 联机，几乎是 PS2 的便携版。</p>
+              <p class="card-text">Sony's challenge to Nintendo's handheld dominance. 4.3" widescreen, UMD optical discs, and Wi-Fi multiplayer — essentially a portable PS2.</p>
               <div class="card-tags">
-                <span class="badge card-tag">钢琴黑</span>
+                <span class="badge card-tag">Piano Black</span>
                 <span class="badge card-tag">UMD</span>
                 <span class="badge card-tag">Wi-Fi</span>
               </div>
@@ -170,7 +182,7 @@
             <div class="card-footer">
               <a href="psp.html" class="btn btn-load w-100">
                 <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i>
-                进入 3D 展示
+                Enter 3D Showcase
               </a>
             </div>
           </div>
@@ -181,14 +193,14 @@
   </section>
 
 
-  <!-- ===== 页脚 ===== -->
+  <!-- ===== Footer ===== -->
   <footer class="museum-footer" role="contentinfo">
     <div class="container-fluid">
       <div class="footer-inner">
         <div class="footer-copyright">
           <p>&copy; 2026 Handheld Heritage &mdash; University of Sussex 3D Apps</p>
         </div>
-        <div class="footer-social" aria-label="外部链接">
+        <div class="footer-social" aria-label="External links">
           <a href="https://github.com" target="_blank" rel="noopener" aria-label="GitHub">
             <i class="bi bi-github" aria-hidden="true"></i>
           </a>
@@ -198,7 +210,7 @@
           <a href="#" aria-label="Instagram">
             <i class="bi bi-instagram" aria-hidden="true"></i>
           </a>
-          <a href="about.html" aria-label="关于本项目">
+          <a href="about.html" aria-label="About this project">
             <i class="bi bi-info-circle" aria-hidden="true"></i>
           </a>
         </div>
@@ -207,5 +219,9 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- 全站共用 BGM 播放器（顶部条） -->
+  <script type="module" src="/src/js/bgmInit.js"></script>
+  <!-- 主页预览：在三张卡片中各加载一个真实 GLB 模型，满足"同一页面加载多个模型"要求 -->
+  <script type="module" src="/src/js/previewIndex.js"></script>
 </body>
 </html>

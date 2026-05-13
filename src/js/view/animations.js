@@ -28,7 +28,8 @@ export function animateCameraToPreset(camera, controls, preset) {
 }
 
 /**
- * GBA SP 翻盖动画（铰链从 0° 旋转到 135°，或返回 0°）
+ * GBA SP 翻盖动画（占位方块用：直接旋转 lid mesh）
+ * 真实 GLB 模型请使用 setupFlipAction + playFlipAction（基于 AnimationMixer）
  * @param {THREE.Object3D} lidMesh - 翻盖网格
  * @param {boolean} open - true=打开，false=合上
  */
@@ -39,6 +40,41 @@ export function animateFlip(lidMesh, open) {
     duration: 0.9,
     ease: 'back.inOut(1.5)',
   });
+}
+
+/**
+ * 配置 GLTF 内嵌动画的 Action
+ * - LoopOnce + clampWhenFinished：动画停在末帧，不会闪回起点
+ * - 初始暂停于第 0 帧（= 模型的初始姿态）
+ * @param {THREE.AnimationMixer} mixer
+ * @param {THREE.AnimationClip} clip
+ * @returns {THREE.AnimationAction}
+ */
+export function setupFlipAction(mixer, clip) {
+  const action = mixer.clipAction(clip);
+  action.setLoop(THREE.LoopOnce);
+  action.clampWhenFinished = true;
+  action.play();
+  action.paused = true; // 停在第 0 帧（打开姿态）
+  return action;
+}
+
+/**
+ * 切换翻盖方向（正放=关，倒放=开）
+ * 用户录的是单向"关闭"动画，倒放即打开
+ * @param {THREE.AnimationAction} action
+ * @param {boolean} open - true=打开（倒放），false=关闭（正放）
+ */
+export function playFlipAction(action, open) {
+  const dur = action.getClip().duration;
+
+  // 如果当前停在边界，先把时间拨到对侧，否则播放方向不对
+  if (open && action.time <= 0)        action.time = dur;
+  if (!open && action.time >= dur - 0.001) action.time = 0;
+
+  action.timeScale = open ? -1 : 1;
+  action.paused = false;
+  if (!action.isRunning()) action.play();
 }
 
 /**
